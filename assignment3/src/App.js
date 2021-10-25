@@ -5,10 +5,14 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 function App() {
 
+    // Initialize states that will be used throughout the app
+
     const [error, setError] = useState(null);
     const [generated, setGenerated] = useState(false);
     const [userDetails, setUserDetails] = useState([]);
     const [subjectScores, setSubjectScores] = useState([]);
+
+    // Populate the list of courses along with their scores
 
     const courses = [
         {"name": "Practical Database Concepts", "score": 94},
