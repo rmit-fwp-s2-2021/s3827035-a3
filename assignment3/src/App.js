@@ -243,7 +243,7 @@ function App() {
 
                             <Form.Group className="mb-3">
                                 <Form.Label>Full Name</Form.Label>
-                                <Form.Control type="text" name="full_name" placeholder=""/>
+                                <Form.Control type="text" name="full_name" aria-label="full_name" placeholder=""/>
                             </Form.Group>
 
                         </div>
@@ -252,7 +252,7 @@ function App() {
 
                             <Form.Group className="mb-3">
                                 <Form.Label>Student Number</Form.Label>
-                                <Form.Control type="text" name="student_number" placeholder=""/>
+                                <Form.Control type="text" name="student_number" aria-label="student_number" placeholder=""/>
                             </Form.Group>
 
                         </div>
@@ -265,7 +265,7 @@ function App() {
 
                             <Form.Group className="mb-3">
                                 <Form.Label>Program Name</Form.Label>
-                                <Form.Control type="text" name="program_name" placeholder=""/>
+                                <Form.Control type="text" name="program_name" aria-label="program_name" placeholder=""/>
                             </Form.Group>
 
                         </div>
@@ -299,7 +299,7 @@ function App() {
                         </div>
                     )}
 
-                    <Button variant="primary" type="submit">
+                    <Button variant="primary" type="submit" id="submit">
                         Generate
                     </Button>
 
@@ -336,7 +336,7 @@ function App() {
                         </tr>
 
                         {reportCard.courses.map((course) =>
-                            <tr>
+                            <tr key={course.name}>
                                 <td>{course.name}</td>
                                 <td>{course.score}/100 ({course.gpa_translated})</td>
                             </tr>
