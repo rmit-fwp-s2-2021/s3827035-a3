@@ -1,5 +1,5 @@
 import React, {useMemo, useState} from "react";
-import {Form, Button, Alert} from "react-bootstrap";
+import {Form, Button, Alert, Table} from "react-bootstrap";
 
 import 'bootstrap/dist/css/bootstrap.min.css';
 
@@ -35,22 +35,31 @@ function App() {
 
             let score = subjectScores[x].score;
             let gpa = 0;
+            let gpaTranslated = 'F';
 
             // Set the GPA of the individual subject
 
             if (score >= 80) {
                 gpa = 4;
+                gpaTranslated = 'HD';
             } else if (score >= 70) {
                 gpa = 3;
+                gpaTranslated = 'D';
             } else if (score >= 60) {
                 gpa = 2;
+                gpaTranslated = 'CR';
             } else if (score >= 50) {
                 gpa = 1;
+                gpaTranslated = 'P';
             }
 
             // Sum up the total grade points
 
             gradePoints += (gpa * 12);
+
+            // Add the GPA of the subject to the array as well
+
+            subjectScores[x].gpa_translated = gpaTranslated;
 
         }
 
@@ -297,7 +306,55 @@ function App() {
                 </Form>
             ) : (
 
-                <div>aa</div>
+                <div>
+
+                    <Table striped bordered hover>
+
+                        <tbody>
+
+                        <tr>
+                            <td colSpan={2} className="text-center"><b>Student Information</b></td>
+                        </tr>
+
+                        <tr>
+                            <td>Student Name</td>
+                            <td>{reportCard.full_name}</td>
+                        </tr>
+
+                        <tr>
+                            <td>Student ID</td>
+                            <td>s{reportCard.student_number}</td>
+                        </tr>
+
+                        <tr>
+                            <td>Program Name</td>
+                            <td>{reportCard.program_name}</td>
+                        </tr>
+
+                        <tr>
+                            <td colSpan={2} className="text-center"><b>Courses Completed</b></td>
+                        </tr>
+
+                        {reportCard.courses.map((course) =>
+                            <tr>
+                                <td>{course.name}</td>
+                                <td>{course.score}/100 ({course.gpa_translated})</td>
+                            </tr>
+                        )}
+
+                        <tr>
+                            <td colSpan={2} className="text-center"><b>Final GPA</b></td>
+                        </tr>
+
+                        <tr>
+                            <td>Cumulative GPA</td>
+                            <td>{reportCard.gpa}</td>
+                        </tr>
+
+                        </tbody>
+                    </Table>
+
+                </div>
 
             )}
 
