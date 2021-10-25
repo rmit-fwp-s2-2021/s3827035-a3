@@ -39,3 +39,36 @@ test('fill the form and get the GPA', () => {
     expect(expectedGpa).toBeInTheDocument();
 
 });
+
+// This test fills an invalid name in the field
+// Then, it submits the form
+// After submitting the button, it checks whether for the expected error message
+
+test('fill wrong input and expect an error', () => {
+
+    // Render the App
+
+    const page = render(<App/>);
+
+    // Select the name field
+
+    const nameInput = page.getByLabelText('full_name');
+
+    // Set the input with a bad name
+
+    fireEvent.change(nameInput, {target: {value: 'example of a bad name'}});
+
+    // Select the button and click on it
+
+    const button = screen.getByText('Generate');
+    fireEvent.click(button);
+
+    // Read the screen and find an error message
+
+    const expectedErrorMessage = screen.getByText(/You have written an invalid name. Please make sure that it is in the following format: Areeb Majeed/i);
+
+    // Expect the GPA to be in the document
+
+    expect(expectedErrorMessage).toBeInTheDocument();
+
+});
