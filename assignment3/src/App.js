@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useMemo, useState} from "react";
 import {Form, Button, Alert} from "react-bootstrap";
 
 import 'bootstrap/dist/css/bootstrap.min.css';
@@ -6,6 +6,9 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 function App() {
 
     const [error, setError] = useState(null);
+    const [generated, setGenerated] = useState(false);
+    const [userDetails, setUserDetails] = useState([]);
+    const [subjectScores, setSubjectScores] = useState([]);
 
     const courses = [
         {"name": "Practical Database Concepts", "score": 94},
@@ -15,12 +18,69 @@ function App() {
         {"name": "Building IT Systems", "score": 93},
         {"name": "Intro to Computer Systems", "score": 98},
         {"name": "Web Programming", "score": 96},
-        {"name": "Programming 1", "score": 88},
-        {"name": "Software Eng Fundamentals IT", "score": 86},
-        {"name": "Security in Computing & IT", "score": 78},
-        {"name": "Further Programming", "score": 97},
-        {"name": "Networking 1", "score": 97}
+        {"name": "Programming 1", "score": 88}
     ];
+
+    const generateReportCard = (userDetails, subjectScores) => {
+
+        // Initialize a total grade points with 0 default value
+
+        let gradePoints = 0;
+
+        // Loop through each subject
+
+        for (let x = 0; x < subjectScores.length; x++) {
+
+            // Get the score of a subject and set the GPA to 0
+
+            let score = subjectScores[x].score;
+            let gpa = 0;
+
+            // Set the GPA of the individual subject
+
+            if (score >= 80) {
+                gpa = 4;
+            } else if (score >= 70) {
+                gpa = 3;
+            } else if (score >= 60) {
+                gpa = 2;
+            } else if (score >= 50) {
+                gpa = 1;
+            }
+
+            // Sum up the total grade points
+
+            gradePoints += (gpa * 12);
+
+        }
+
+        // Calculate the final GPA rounded to first significant unit
+
+        let finalGpa = Math.round(gradePoints / (48 * 2) * 10) / 10;
+
+        // Create an array with the information
+
+        let data = {
+            "full_name": userDetails['full_name'],
+            "student_number": userDetails['student_number'],
+            "program_name": userDetails['program_name'],
+            "courses": subjectScores,
+            "gpa": finalGpa
+        };
+
+        // Store the information in localStorage
+
+        localStorage.setItem('report_card', JSON.stringify(data));
+
+        return data;
+
+    };
+
+    // Use Memo to generate the report card
+    // useMemo() hook is used to improve the performance of the application by caching the output of an expensive function
+    // For example, a square function may take a considerable amount of time for large numbers. So memoization allows us to cache the output of the function and then return the same output quickly from the memory if the user enters the same input.
+
+    const reportCard = useMemo(() => generateReportCard(userDetails, subjectScores), [userDetails, subjectScores]);
 
     const validateStudentNumber = (number) => {
 
@@ -121,8 +181,29 @@ function App() {
 
         } else {
 
-            // Do something:
+            // Create an array with scores and subject names
 
+            let subjectScores = [];
+
+            for (let x = 0; x < courses.length; x++) {
+
+                subjectScores[x] = {
+                    "name": courses[x].name,
+                    "score": formValues[courses[x].name + "_score"]
+                };
+
+            }
+
+            // Update States:
+
+            setUserDetails({
+                "full_name": formValues['full_name'],
+                "student_number": formValues['student_number'],
+                "program_name": formValues['program_name']
+            });
+
+            setSubjectScores(subjectScores);
+            setGenerated(true);
 
             // Hide the error:
 
@@ -143,75 +224,82 @@ function App() {
 
             {error !== null && <Alert variant="danger">{error}</Alert>}
 
-            <Form onSubmit={e => handleSubmit(e)}>
+            {generated === false ? (
 
-                <div className="row">
-
-                    <div className="col-6">
-
-                        <Form.Group className="mb-3">
-                            <Form.Label>Full Name</Form.Label>
-                            <Form.Control type="text" name="full_name" placeholder=""/>
-                        </Form.Group>
-
-                    </div>
-
-                    <div className="col-6">
-
-                        <Form.Group className="mb-3">
-                            <Form.Label>Student Number</Form.Label>
-                            <Form.Control type="text" name="student_number" placeholder=""/>
-                        </Form.Group>
-
-                    </div>
-
-                </div>
-
-                <div className="row">
-
-                    <div className="col-6">
-
-                        <Form.Group className="mb-3">
-                            <Form.Label>Program Name</Form.Label>
-                            <Form.Control type="text" name="program_name" placeholder=""/>
-                        </Form.Group>
-
-                    </div>
-
-                </div>
-
-                <hr/>
-
-                {courses.map((course) =>
+                <Form onSubmit={e => handleSubmit(e)}>
 
                     <div className="row">
 
-                        <div className="col-8">
+                        <div className="col-6">
 
                             <Form.Group className="mb-3">
-                                <Form.Label>Course Name</Form.Label>
-                                <Form.Control type="text" defaultValue={course.name}/>
+                                <Form.Label>Full Name</Form.Label>
+                                <Form.Control type="text" name="full_name" placeholder=""/>
                             </Form.Group>
 
                         </div>
 
-                        <div className="col-4">
+                        <div className="col-6">
 
                             <Form.Group className="mb-3">
-                                <Form.Label>Score</Form.Label>
-                                <Form.Control type="text" name={course.name + "_score"} defaultValue={course.score}/>
+                                <Form.Label>Student Number</Form.Label>
+                                <Form.Control type="text" name="student_number" placeholder=""/>
                             </Form.Group>
 
                         </div>
 
                     </div>
-                )}
 
-                <Button variant="primary" type="submit">
-                    Generate
-                </Button>
+                    <div className="row">
 
-            </Form>
+                        <div className="col-6">
+
+                            <Form.Group className="mb-3">
+                                <Form.Label>Program Name</Form.Label>
+                                <Form.Control type="text" name="program_name" placeholder=""/>
+                            </Form.Group>
+
+                        </div>
+
+                    </div>
+
+                    <hr/>
+
+                    {courses.map((course) =>
+
+                        <div className="row" key={course.name}>
+
+                            <div className="col-8">
+
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Course Name</Form.Label>
+                                    <Form.Control type="text" defaultValue={course.name}/>
+                                </Form.Group>
+
+                            </div>
+
+                            <div className="col-4">
+
+                                <Form.Group className="mb-3">
+                                    <Form.Label>Score</Form.Label>
+                                    <Form.Control type="text" name={course.name + "_score"} defaultValue={course.score}/>
+                                </Form.Group>
+
+                            </div>
+
+                        </div>
+                    )}
+
+                    <Button variant="primary" type="submit">
+                        Generate
+                    </Button>
+
+                </Form>
+            ) : (
+
+                <div>aa</div>
+
+            )}
 
         </div>
     );
